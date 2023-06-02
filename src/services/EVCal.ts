@@ -60,7 +60,7 @@ export const xldownload = async (projectName: string) => {
   const s3Params = {
     Bucket: "evdatafiles",
     Key: `${projectName}.xlsx`,
-    expirationTime: 60,
+    expirationTime: 300,
   };
 
   const url = await generatePresignedUrl(
