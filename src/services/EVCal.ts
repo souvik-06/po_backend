@@ -60,17 +60,33 @@ export const xldownload = async (projectName: string) => {
   const s3Params = {
     Bucket: "evdatafiles",
     Key: `${projectName}.xlsx`,
+    expirationTime: 60,
   };
 
-  try {
-    const data = await s3bucket.getObject(s3Params).promise();
+  const url = await generatePresignedUrl(
+    s3Params.Bucket,
+    s3Params.Key,
+    s3Params.expirationTime
+  )
+    .then((url) => {
+      //console.log(url);
+      return url;
+    })
+    .catch((error) => {
+      console.error("Error generating pre-signed URL:", error);
+    });
 
-    return data.Body;
-  } catch (error) {
-    // Handle the error
-    console.error("Error downloading and parsing XLSX file:", error);
-    throw error; // or return an appropriate error response
-  }
+  return url;
+
+  // try {
+  //   const data = await s3bucket.getObject(s3Params).promise();
+
+  //   return data.Body;
+  // } catch (error) {
+  //   // Handle the error
+  //   console.error("Error downloading and parsing XLSX file:", error);
+  //   throw error; // or return an appropriate error response
+  // }
 };
 
 // export const xldownload = async (projectName: string) => {
@@ -85,6 +101,38 @@ export const xldownload = async (projectName: string) => {
 //   );
 //   return wb;
 // };
+
+async function generatePresignedUrl(bucketName, objectKey, expiration = 3600) {
+  const params = {
+    Bucket: bucketName,
+    Key: objectKey,
+    Expires: expiration,
+  };
+
+  return new Promise((resolve, reject) => {
+    s3bucket.getSignedUrl("getObject", params, (error, url) => {
+      if (error) {
+        console.error("Error generating pre-signed URL:", error);
+        reject(error);
+      } else {
+        resolve(url);
+      }
+    });
+  });
+}
+
+// Example usage
+// const bucketName = "your-bucket-name";
+// const objectKey = "your-object-key";
+// const expirationTime = 3600; // 1 hour
+
+// generatePresignedUrl(bucketName, objectKey, expirationTime)
+//   .then((url) => {
+//     console.log(url);
+//   })
+//   .catch((error) => {
+//     console.error("Error generating pre-signed URL:", error);
+//   });
 
 export const getEvFile = async (): Promise<string[] | undefined> => {
   try {

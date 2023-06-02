@@ -92,18 +92,18 @@ export const xlDownloadAllData = async (req: Request, res: Response) => {
   try {
     const projectName: string = req.params.data;
 
-    const data = await xldownload(projectName);
+    const url = await xldownload(projectName);
 
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename=${projectName}.xlsx`
-    );
-    res.setHeader(
-      "Content-type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    );
+    // res.setHeader(
+    //   "Content-Disposition",
+    //   `attachment; filename=${projectName}.xlsx`
+    // );
+    // res.setHeader(
+    //   "Content-type",
+    //   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    // );
 
-    res.send(data);
+    res.send(url);
     res.status(200);
   } catch (err) {
     res.status(404).json(err);
