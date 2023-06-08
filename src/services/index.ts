@@ -1,33 +1,34 @@
-import { docClient, s3bucket } from '../config/db';
-import { v4 as uuidv4 } from 'uuid';
+import { docClient, s3bucket } from "../config/db";
+import { v4 as uuidv4 } from "uuid";
 
-import { S3 } from 'aws-sdk';
-import { ManagedUpload } from 'aws-sdk/lib/s3/managed_upload';
-import { DocumentClient } from 'aws-sdk/clients/dynamodb';
-import { Details, UpdateDetails } from '../types';
+import { S3 } from "aws-sdk";
+import { ManagedUpload } from "aws-sdk/lib/s3/managed_upload";
+import { DocumentClient } from "aws-sdk/clients/dynamodb";
+import { Details, UpdateDetails } from "../types";
 
 export const insert = (data: Details, file: Express.Multer.File) => {
   try {
     const s3Params: S3.PutObjectRequest = {
-      Bucket: 'team1backendbucket',
-      Key: file.originalname + ',' + uuidv4(),
+      Bucket: "team1backendbucket",
+      Key: file.originalname + "," + uuidv4(),
       Body: file.buffer,
-      ACL: 'public-read-write',
+      ACL: "public-read-write",
     };
     s3bucket.upload(
       s3Params,
       (
         err: Error,
-        s3Data: ManagedUpload.SendData & S3.ManagedUpload.SendData,
+        s3Data: ManagedUpload.SendData & S3.ManagedUpload.SendData
       ) => {
         if (err) {
           console.error(err);
         } else {
           // Store file information in DynamoDB
           const params: DocumentClient.PutItemInput = {
-            TableName: 'podetails',
+            TableName: "podetails",
             Item: {
               ponumber: data.po_id,
+              potype: data.po_type,
               details: data.items,
               date: data.date,
               poname: data.poname,
@@ -38,14 +39,14 @@ export const insert = (data: Details, file: Express.Multer.File) => {
           };
           docClient.put(params, (err) => {
             if (err) {
-              console.error('Unable to add po details', err);
+              console.error("Unable to add po details", err);
             }
           });
         }
-      },
+      }
     );
   } catch (e) {
-    console.log('hi');
+    console.log("hi");
   }
 };
 
@@ -56,18 +57,18 @@ export const getAllPOItems = async () => {
   //     primary_key: startKey,
   //   };
   const params: DocumentClient.ScanInput = {
-    TableName: 'podetails',
+    TableName: "podetails",
     // Limit: limit || 7,
     // ...(startKey ? { ExclusiveStartKey } : {}),
   };
   const po = await docClient.scan(params).promise();
-  console.log(po);
+  //console.log(po);
   return po;
 };
 
 export const getDetailsWithID = async (id: string) => {
   const params: DocumentClient.GetItemInput = {
-    TableName: 'podetails',
+    TableName: "podetails",
     Key: {
       ponumber: id,
     },
@@ -78,26 +79,27 @@ export const getDetailsWithID = async (id: string) => {
 };
 
 export const updatePOData = async (id: string, data: UpdateDetails[]) => {
+  console.log(data);
   const itemslist = data.map(
-    ({ description, amount, dmrNo = '', raisedAmount = '', date }) => ({
-      description: description,
+    ({ po_description, amount, dmrNo = "", raisedAmount = "", date = "" }) => ({
+      po_description: po_description,
       amount: amount,
       dmrNo: dmrNo,
       raisedAmount: raisedAmount,
       date: date,
-    }),
+    })
   );
   const params: DocumentClient.Update = {
-    TableName: 'podetails',
+    TableName: "podetails",
     Key: {
       ponumber: id,
     },
-    UpdateExpression: 'SET #X = :X',
+    UpdateExpression: "SET #X = :X",
     ExpressionAttributeValues: {
-      ':X': itemslist,
+      ":X": itemslist,
     },
     ExpressionAttributeNames: {
-      '#X': 'details',
+      "#X": "details",
     },
   };
 
