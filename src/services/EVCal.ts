@@ -216,6 +216,48 @@ export const insertXlSData = async (data: WorkSheet, projectName: string) => {
   });
 
   const mergedData = Array.from(mergedDataMap.values());
+
+  // function customSort(a: string, b: string): number {
+  //   const monthYearRegex: RegExp = /([a-z]{3})-(\d{2})/;
+  //   const [, monthA = '', yearA = ''] = (a.match(monthYearRegex) || []);
+  //   const [, monthB = '', yearB = ''] = (b.match(monthYearRegex) || []);
+
+  //   // Handle cases where month-year value is missing or invalid
+  //   if (!monthA || !yearA) return 1;
+  //   if (!monthB || !yearB) return -1;
+
+  //   // Extract month and year values
+  //   const monthValueA: number = monthToNumber(monthA);
+  //   const monthValueB: number = monthToNumber(monthB);
+  //   const yearValueA: number = parseInt(yearA);
+  //   const yearValueB: number = parseInt(yearB);
+
+  //   // Sort by year first, then by month
+  //   if (yearValueA !== yearValueB) {
+  //     return yearValueA - yearValueB;
+  //   } else {
+  //     return monthValueA - monthValueB;
+  //   }
+  // }
+
+  // function monthToNumber(month: string): number {
+  //   const monthNames: string[] = [
+  //     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  //     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  //   ];
+  //   return monthNames.indexOf(month);
+  // }
+
+  // // Sort merged data using the custom sorting function
+  // mergedData.sort((a: any, b: any) => {
+  //   const keys: string[] = Object.keys(a).filter(key => key !== "Resource" && key !== "Ofshore");
+  //   const monthYearColumns: string[] = keys.filter(key => key.match(/[a-z]{3}-\d{2}/i));
+  //   const monthYearA: string | undefined = monthYearColumns.find(column => a[column]);
+  //   const monthYearB: string | undefined = monthYearColumns.find(column => b[column]);
+  //   return customSort(monthYearA || '', monthYearB || '');
+  // });
+
+  //console.log(mergedData);
   const newWs: WorkSheet = utils.json_to_sheet(mergedData);
   const newwb: WorkBook = utils.book_new();
   utils.book_append_sheet(newwb, newWs, "JP-M");

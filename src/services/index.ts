@@ -31,8 +31,10 @@ export const insert = (data: Details, file: Express.Multer.File) => {
               potype: data.po_type,
               details: data.items,
               date: data.date,
+              currency: data.currency,
               poname: data.poname,
               projectName: data.projectName,
+
               filename: data.filename,
               filePath: s3Data.Location,
             },

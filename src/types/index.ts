@@ -20,6 +20,7 @@ export type Details = {
   poname: string;
   projectName: string;
   date: string;
+  currency: string;
   items: Item[];
   filename: string;
   filePath: string;
